@@ -1,5 +1,7 @@
 package com.example.Combine.Security.Methods.securityConfig;
 
+import com.example.Combine.Security.Methods.entity.InvalidatedToken;
+import com.example.Combine.Security.Methods.repository.InvalidatedTokenRepository;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -8,6 +10,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -23,11 +28,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class JwtService {
 
     private String secret = "Hau7xDiufIWgIkom9Df9v9OM3QjB03iB3fVV47gItPS+PJsTfia/fA7PwE0LTHKq\r\n";
 
     private long expiration = 3600;
+
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
 
     public String generateToken(UserDetails userDetails) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
@@ -75,6 +83,21 @@ public class JwtService {
         final String username = extractUsername(token);
         return (username != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    public void invalidateToken(String token) throws ParseException, JOSEException {
+        JWTClaimsSet claims = extractAllClaims(token);
+        if (claims != null) {
+            Date expiryDate = claims.getExpirationTime();
+            LocalDateTime expiryLocalDateTime = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            invalidatedTokenRepository.save(new InvalidatedToken(token, expiryLocalDateTime));
+        }
+    }
+
+    public boolean isTokenInvalidated(String token) {
+        LocalDateTime now = LocalDateTime.now();
+        return invalidatedTokenRepository.existsByTokenAndExpiryDateAfter(token, now);
+    }
+
 
     public static class JwtVerificationException extends RuntimeException {
         public JwtVerificationException(String message) {

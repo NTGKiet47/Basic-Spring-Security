@@ -16,6 +16,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.text.ParseException;
 
+/*
+* validating tokens and setting the authentication context
+*/
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -45,6 +49,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 if (jwtService.isTokenValid(token, userDetails)) {
+                    if (jwtService.isTokenInvalidated(token)) {
+                        response.setStatus(401);
+                        return;
+                    }
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -52,7 +60,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (JwtService.JwtParseException | JwtService.JwtVerificationException | JwtService.JwtJoseException e) {
-            // Handle token decoding/verification errors
             response.setStatus(401); // Unauthorized
             return;
         } catch (ParseException e) {

@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,7 +36,7 @@ public class SecurityConfig {
                 .formLogin(login -> login.successHandler(usernameAuthSuccessHandler)
                         .failureHandler(
                                 new org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler()))
-                .logout((logout) -> logout.logoutUrl("/logout")).rememberMe(Customizer.withDefaults())
+                .logout((logout) -> logout.logoutUrl("/logout").addLogoutHandler(new JwtLogoutHandler(jwtService)))
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserServiceCustom))
                         .successHandler(oauth2AuthSuccessHandler).failureUrl("/auth/login"))
                 .exceptionHandling(e -> e.accessDeniedPage("/accessDeined")).csrf(AbstractHttpConfigurer::disable);
