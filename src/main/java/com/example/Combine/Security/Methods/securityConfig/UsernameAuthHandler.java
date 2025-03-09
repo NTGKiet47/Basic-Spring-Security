@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.context.annotation.Configuration;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
+@Slf4j
 public class UsernameAuthHandler implements AuthenticationSuccessHandler {
 
     private final JwtService jwtService;
@@ -29,7 +29,6 @@ public class UsernameAuthHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-
         UserDetails userDetails = User.withUsername(authentication.getName()).password("").authorities(authentication.getAuthorities()).build();
 
         var jwtToken = jwtService.generateToken(userDetails);
@@ -41,5 +40,6 @@ public class UsernameAuthHandler implements AuthenticationSuccessHandler {
         response.getWriter().write(objectMapper.writeValueAsString(responseBody));
         response.setStatus(HttpStatus.OK.value());
 
+        log.info("User {} has logged in", authentication.getName());
     }
 }

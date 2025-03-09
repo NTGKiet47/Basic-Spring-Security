@@ -7,16 +7,14 @@
  ******************************************************************************/
 package com.example.Combine.Security.Methods.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * Account
@@ -43,6 +41,12 @@ public class Account {
     String fullname;
     String email;
 
-    String accountType;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "account_role",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    List<Role> roles;
 
 }
