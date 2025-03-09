@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class InvalidatedToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String token;
 
     private LocalDateTime expiryDate;

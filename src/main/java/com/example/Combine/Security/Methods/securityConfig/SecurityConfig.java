@@ -11,9 +11,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -22,7 +22,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CustomOauth2UserService oAuth2UserServiceCustom,
-                                           JwtService jwtService) throws Exception {
+                                           JwtService jwtService,JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
         UsernameAuthHandler usernameAuthSuccessHandler = new UsernameAuthHandler(jwtService,
@@ -35,18 +35,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .formLogin(login -> login.successHandler(usernameAuthSuccessHandler)
                         .failureHandler(
-                                new org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler()))
+                                new org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler()).permitAll())
                 .logout((logout) -> logout.logoutUrl("/logout").addLogoutHandler(new JwtLogoutHandler(jwtService)))
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserServiceCustom))
                         .successHandler(oauth2AuthSuccessHandler).failureUrl("/auth/login"))
-                .exceptionHandling(e -> e.accessDeniedPage("/accessDeined")).csrf(AbstractHttpConfigurer::disable);
+                .exceptionHandling(e -> e.accessDeniedPage("/accessDeined"))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
     }
 
     @Bean

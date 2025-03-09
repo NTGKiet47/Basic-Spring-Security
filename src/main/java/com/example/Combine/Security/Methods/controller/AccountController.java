@@ -7,6 +7,7 @@
  ******************************************************************************/
 package com.example.Combine.Security.Methods.controller;
 
+import com.example.Combine.Security.Methods.dto.RegisterDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import com.example.Combine.Security.Methods.service.AccountService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * AccountController
@@ -45,8 +47,8 @@ public class AccountController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(String username, String password) {
-        return ResponseEntity.ok(accountService.register(username, password));
+    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {
+        return ResponseEntity.ok(accountService.register(registerDto.username(), registerDto.password()));
     }
 
 }

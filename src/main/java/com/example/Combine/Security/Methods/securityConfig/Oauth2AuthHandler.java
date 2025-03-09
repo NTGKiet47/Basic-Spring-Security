@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class Oauth2AuthHandler implements AuthenticationSuccessHandler {
 
     private final JwtService jwtService;
@@ -41,5 +43,8 @@ public class Oauth2AuthHandler implements AuthenticationSuccessHandler {
         response.setContentType("application/json");
         response.getWriter().write(objectMapper.writeValueAsString(responseBody));
         response.setStatus(HttpStatus.OK.value());
+
+        log.info("User {} has logged in", authentication.getName());
+
     }
 }
