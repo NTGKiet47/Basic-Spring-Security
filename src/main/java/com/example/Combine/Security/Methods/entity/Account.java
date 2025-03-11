@@ -8,11 +8,8 @@
 package com.example.Combine.Security.Methods.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -33,13 +30,23 @@ import java.util.List;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "account_id")
+    String accountId;
 
-    String username;
-    String password;
-    String fullname;
+    @Column(unique = true)
     String email;
+
+    @Nullable
+    String password;
+
+    String name;
+
+    @Column(unique = true)
+    String phoneNumber;
+    Boolean gender;
+    String provider;
+    String status;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
