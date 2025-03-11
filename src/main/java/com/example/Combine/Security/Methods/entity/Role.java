@@ -1,8 +1,10 @@
 package com.example.Combine.Security.Methods.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,7 +22,8 @@ public class Role {
 
     String roleName;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
-    List<Account> accounts;
+    List<Account> accounts = new ArrayList<>();
 
 }

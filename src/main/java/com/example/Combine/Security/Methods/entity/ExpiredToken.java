@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @Table(name = "invalid_token")
-public class InvalidatedToken {
+public class ExpiredToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

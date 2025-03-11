@@ -1,6 +1,6 @@
 package com.example.Combine.Security.Methods.securityConfig;
 
-import com.example.Combine.Security.Methods.entity.InvalidatedToken;
+import com.example.Combine.Security.Methods.entity.ExpiredToken;
 import com.example.Combine.Security.Methods.repository.InvalidatedTokenRepository;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -89,7 +89,7 @@ public class JwtService {
         if (claims != null) {
             Date expiryDate = claims.getExpirationTime();
             LocalDateTime expiryLocalDateTime = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            invalidatedTokenRepository.save(new InvalidatedToken(token, expiryLocalDateTime));
+            invalidatedTokenRepository.save(new ExpiredToken(token, expiryLocalDateTime));
         }
     }
 
