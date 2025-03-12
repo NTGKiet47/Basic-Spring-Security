@@ -16,9 +16,9 @@ import java.util.List;
 /**
  * Account
  *
+ * @author KietNTG
  * @version 01-00
  * @since 01-00
- * @author KietNTG
  */
 @Entity
 @Setter
@@ -30,9 +30,9 @@ import java.util.List;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "account_id")
-    String accountId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    Integer accountId;
 
     @Column(unique = true)
     String email;
@@ -40,13 +40,9 @@ public class Account {
     @Nullable
     String password;
 
-    String name;
+    String fullname;
 
-    @Column(unique = true)
-    String phoneNumber;
-    Boolean gender;
-    String provider;
-    String status;
+    String username;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
